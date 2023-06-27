@@ -17,7 +17,7 @@
 
   use Math::Int113;
 
-  A Math::Int113 holds, by definition, an integer value in the range
+  A Math::Int113 object holds, by definition, an integer value in the range
   -10384593717069655257060992658440192 .. 10384593717069655257060992658440192.
 
   Any perl scalar, $x, will be evaluated as int($x), except for scalars used
