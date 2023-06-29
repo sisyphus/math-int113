@@ -5,15 +5,17 @@ use Config;
 
 use Test::More;
 
+my $obj1 = Math::Int113->new(~0) * 54321;
+my $obj2 = Math::Int113->new(~0) * 12345;
+
 if($Config{ivsize} != 8) {
-  warn "Skipping tests - bitwise operators not yet available for perls whose ivsize is not 8";
-  cmp_ok(1, '==', 1, "dummy test");
+  # TODO: test '>>' and '<<', which are available when ivsize is 4
+  eval {my $x = ~(Math::Int113->new(2 ** 12));};
+  like($@, qr/Bitwise \(~\) operations not yet implemented/, "Bitwise operation fails as expected");
+  warn "Skipping remaining tests - bitwise operators not yet available when ivsize is not 8\n";
   done_testing();
   exit 0;
 }
-
-my $obj1 = Math::Int113->new(~0) * 54321;
-my $obj2 = Math::Int113->new(~0) * 12345;
 
 cmp_ok($obj1, '==', 1002045584827976553278415, "1st object assigned correctly");
 cmp_ok($obj2, '==', 227725055589944414687175,  "2nd object assigned correctly");
@@ -40,5 +42,14 @@ cmp_ok($not_obj2, '==', 10384593716841930201471048243753016, "~2nd evaluates cor
 cmp_ok(~$not_obj1, '==', $obj1, "~(~1st) evaluates correctly");
 cmp_ok(~$not_obj2, '==', $obj2, "~(~2nd) evaluates correctly");
 
+my $not_zero = ~(Math::Int113->new(0));
+cmp_ok($not_zero, '==', Math::Int113->new(10384593717069655257060992658440191), '~(Math::Int113->new(0)) evaluates to 10384593717069655257060992658440191');
+cmp_ok($not_zero, '==', (2 ** 113) - 1, '~(Math::Int113->new(0)) evaluates to (2**113)-1');
+
+$not_zero++;
+cmp_ok($not_zero, '==', 2 ** 113, '~(Math::Int113->new(0)) increments to 2**113');
+
+$not_zero--;
+cmp_ok($not_zero, '==', ~(Math::Int113->new(0)), 'Math::Int113->new(2**113) decrements to ~(Math::Int113->new(0))');
 
 done_testing();
