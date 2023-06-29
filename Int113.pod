@@ -37,8 +37,12 @@
 
   No functions are provided, except for the subroutines that are responsible
   for overloading the  '+', '-', '*', '/', '**', '++', '--', '>=', '<=',
-  '==', '!=', '>', '<', '<=>', '""', '+=', '-=', '*=', '/=', '**=' and
+  '==', '!=', '>', '<', '<=>', '""', '+=', '-=', '*=', '/=', '**=',
+  '<<', '>>', '&', '|', '^', '~', '<<=', '>>=', '&=', '|=', '^=', and
   perhaps other operations.
+
+  Note: The left shift, right shift and bitwise operators are currently not
+        available on perls whose ivsize ($Config{ivsize}) is 4.
 
 =head1 LICENSE
 
