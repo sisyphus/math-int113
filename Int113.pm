@@ -5,6 +5,8 @@ use Config;
 
 $Math::Int113::VERSION = '0.01';
 
+use constant  IVSIZE_IS_8  => $Config{ivsize} == 8 ? 1 : 0;
+
 use overload
 '+'    => \&oload_add,
 '-'    => \&oload_sub,
@@ -20,6 +22,12 @@ use overload
 '<'    => \&oload_lt,
 '<=>'  => \&oload_spaceship,
 '""'   => \&oload_stringify,
+'&'    => \&oload_and,
+'|'    => \&oload_or,
+'^'    => \&oload_xor,
+'~'    => \&oload_not,
+'>>'   => \&oload_rshift,
+'<<'   => \&oload_lshift,
 ;
 
 if($Config{nvtype} ne '__float128') {
@@ -190,5 +198,149 @@ sub oload_stringify {
   return sprintf("%.36g", $self->{val});
 }
 
+sub oload_rshift {
+  my($_1, $_2) = (shift, shift);
+
+  die ">> not done on negative value ($_1)"
+    if $_1 < 0;
+  die "Cannot right shift by a negative amount ($_2)"
+    if $_2 < 0;
+
+  if(ref($_2) eq 'Math::Int113') {
+    return $_1 / (2 ** ($_2->{val}));
+  }
+
+  # No need to throw an error if overflows($_2)
+
+  return $_1 / (2 ** int($_2));
+}
+
+sub oload_lshift {
+  my($_1, $_2) = (shift, shift);
+
+  die "<< not done on negative value ($_1)"
+    if $_1 < 0;
+  die "Cannot left shift by a negative amount ($_2)"
+    if $_2 < 0;
+
+  if(ref($_2) eq 'Math::Int113') {
+    return $_1 * (2 ** ($_2->{val}));
+  }
+
+  # No need to throw an error if overflows($_2)
+
+  return $_1 *  (2 ** int($_2));
+}
+
+sub oload_and {
+  if(IVSIZE_IS_8) {
+    my($_1, $_2) = (shift, shift);
+
+    die "& not done on negative value ($_1)"
+      if $_1 < 0;
+    die "& not done on negative value ($_2)"
+      if $_2 < 0;
+
+    my($hi_1, $lo_1) = hi_lo($_1);
+    my($hi_2, $lo_2) = hi_lo($_2);
+
+    my $hi = $hi_1->{val} & $hi_2->{val};
+    $hi *= 2 ** 64;
+
+    my $lo = $lo_1->{val} & $lo_2->{val};
+
+    return Math::Int113->new($hi + $lo);
+  }
+  else {
+    die "Bitwise (&) operations not yet implemented when $Config{ivsize} is 4";
+  }
+}
+
+sub oload_or {
+  if(IVSIZE_IS_8) {
+    my($_1, $_2) = (shift, shift);
+
+    die "| not done on negative value ($_1)"
+      if $_1 < 0;
+    die "| not done on negative value ($_2)"
+      if $_2 < 0;
+
+    my($hi_1, $lo_1) = hi_lo($_1);
+    my($hi_2, $lo_2) = hi_lo($_2);
+
+    my $hi = $hi_1->{val} | $hi_2->{val};
+    $hi *= 2 ** 64;
+
+    my $lo = $lo_1->{val} | $lo_2->{val};
+
+    return Math::Int113->new($hi + $lo);
+  }
+  else {
+    die "Bitwise (|) operations not yet implemented when $Config{ivsize} is 4";
+  }
+}
+
+sub oload_xor {
+  if(IVSIZE_IS_8) {
+    my($_1, $_2) = (shift, shift);
+
+    die "^ not done on negative value ($_1)"
+      if $_1 < 0;
+    die "^ not done on negative value ($_2)"
+      if $_2 < 0;
+
+    my($hi_1, $lo_1) = hi_lo($_1);
+    my($hi_2, $lo_2) = hi_lo($_2);
+
+    my $hi = $hi_1->{val} ^ $hi_2->{val};
+    $hi *= 2 ** 64;
+
+    my $lo = $lo_1->{val} ^ $lo_2->{val};
+
+    return Math::Int113->new($hi + $lo);
+  }
+  else {
+    die "Bitwise (^) operations not yet implemented when $Config{ivsize} is 4";
+  }
+}
+
+sub oload_not {
+  if(IVSIZE_IS_8) {
+    my($_1) = (shift);
+
+    die "~ not done on negative value ($_1)"
+      if $_1 < 0;
+
+    my($hi_1, $lo_1) = hi_lo($_1);
+
+    my $mask = (2 ** 49) - 1;
+    my $hi = ~($hi_1->{val});
+    $hi &= $mask;
+    $hi *= 2 ** 64;
+
+    my $lo = ~($lo_1->{val});
+
+    return Math::Int113->new($hi + $lo);
+  }
+  else {
+    die "Bitwise (~) operations not yet implemented when $Config{ivsize} is 4";
+  }
+}
+
+sub hi_lo {
+  my($hi, $lo, $obj);
+  if(ref($_[0]) eq 'Math::Int 113') {
+    $obj = shift;
+  }
+  else {
+    $obj = Math::Int113->new(shift);
+  }
+
+  $hi = $obj >> 64;
+  my $intermediate = $hi * (2 ** 64);
+  $lo = $obj - $intermediate;
+
+  return ($hi, $lo);
+}
 1;
 
