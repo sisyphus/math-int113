@@ -52,9 +52,14 @@ cmp_ok(120892581960759230028842188800, '<=', $obj2, "overload '<=' ok with equiv
 cmp_ok($obj2, '>', 99999 , "overload '>' ok");
 cmp_ok($obj2, '>=', 99999, "overload '>=' ok");
 cmp_ok($obj2, '>=', 120892581960759230028842188800, "overload '>=' ok with equivalent values");
-
-cmp_ok(Math::Int113->new(undef), '==', 0, "undef treated as 0");
-cmp_ok(Math::Int113->new('hello'), '==', 0, "'hello' treated as 0");
+{
+  no warnings 'uninitialized';
+  cmp_ok(Math::Int113->new(undef), '==', 0, "undef treated as 0");
+}
+{
+  no warnings 'numeric';
+  cmp_ok(Math::Int113->new('hello'), '==', 0, "'hello' treated as 0");
+}
 cmp_ok(Math::Int113->new(0.9999), '==', 0, "0.9999 treated as 0");
 cmp_ok(Math::Int113->new('0.9999' . ('9' x 60)), '==', 1, "'0.9999' . ('9' x 60) treated as 1");
 
