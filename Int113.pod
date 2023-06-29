@@ -41,8 +41,8 @@
   '<<', '>>', '&', '|', '^', '~', '<<=', '>>=', '&=', '|=', '^=', and
   perhaps other operations.
 
-  Note: The left shift, right shift and bitwise operators are currently not
-        available on perls whose ivsize ($Config{ivsize}) is 4.
+  Note: The bitwise operators (&, |, ^, ~) are currently not available
+        on perls whose ivsize ($Config{ivsize}) is 4.
 
 =head1 LICENSE
 
