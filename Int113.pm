@@ -5,7 +5,11 @@ use Config;
 
 $Math::Int113::VERSION = '0.01';
 
-use constant  IVSIZE_IS_8  => $Config{ivsize} == 8 ? 1 : 0;
+use constant IVSIZE_IS_8  => $Config{ivsize} == 8 ? 1 : 0;
+
+# hint: 49 == 113 - 64; 17 == 113 - 96
+# NOT_MASK is utilised only in sub oload_not()
+use constant NOT_MASK     => IVSIZE_IS_8 ? (2 ** 49) - 1 : (2 ** 17) - 1;
 
 use overload
 '+'    => \&oload_add,
@@ -233,14 +237,15 @@ sub oload_lshift {
 }
 
 sub oload_and {
+
+  my($_1, $_2) = (shift, shift);
+
+  die "& not done on negative value ($_1)"
+    if $_1 < 0;
+  die "& not done on negative value ($_2)"
+    if $_2 < 0;
+
   if(IVSIZE_IS_8) {
-    my($_1, $_2) = (shift, shift);
-
-    die "& not done on negative value ($_1)"
-      if $_1 < 0;
-    die "& not done on negative value ($_2)"
-      if $_2 < 0;
-
     my($hi_1, $lo_1) = hi_lo($_1);
     my($hi_2, $lo_2) = hi_lo($_2);
 
@@ -252,18 +257,35 @@ sub oload_and {
     return Math::Int113->new($hi + $lo);
   }
   else {
-    die "Bitwise (&) operations not yet implemented when $Config{ivsize} is 4";
+
+    my($hi_1, $m1_1, $m2_1, $lo_1) = hi_lo($_1);
+    my($hi_2, $m1_2, $m2_2, $lo_2) = hi_lo($_2);
+
+    my $hi = $hi_1->{val} & $hi_2->{val};
+    $hi *= 2 ** 96;
+
+    my $m1 = $m1_1->{val} & $m1_2->{val};
+    $m1 *= 2 ** 64;
+
+    my $m2 = $m2_1->{val} & $m2_2->{val};
+    $m2 *= 2 ** 32;
+
+    my $lo = $lo_1->{val} & $lo_2->{val};
+
+    return Math::Int113->new($hi + $m1 + $m2 + $lo);
   }
 }
 
 sub oload_or {
-  if(IVSIZE_IS_8) {
-    my($_1, $_2) = (shift, shift);
 
-    die "| not done on negative value ($_1)"
-      if $_1 < 0;
-    die "| not done on negative value ($_2)"
-      if $_2 < 0;
+  my($_1, $_2) = (shift, shift);
+
+  die "| not done on negative value ($_1)"
+    if $_1 < 0;
+  die "| not done on negative value ($_2)"
+    if $_2 < 0;
+
+  if(IVSIZE_IS_8) {
 
     my($hi_1, $lo_1) = hi_lo($_1);
     my($hi_2, $lo_2) = hi_lo($_2);
@@ -276,18 +298,35 @@ sub oload_or {
     return Math::Int113->new($hi + $lo);
   }
   else {
-    die "Bitwise (|) operations not yet implemented when $Config{ivsize} is 4";
+
+    my($hi_1, $m1_1, $m2_1, $lo_1) = hi_lo($_1);
+    my($hi_2, $m1_2, $m2_2, $lo_2) = hi_lo($_2);
+
+    my $hi = $hi_1->{val} | $hi_2->{val};
+    $hi *= 2 ** 96;
+
+    my $m1 = $m1_1->{val} | $m1_2->{val};
+    $m1 *= 2 ** 64;
+
+    my $m2 = $m2_1->{val} | $m2_2->{val};
+    $m2 *= 2 ** 32;
+
+    my $lo = $lo_1->{val} | $lo_2->{val};
+
+    return Math::Int113->new($hi + $m1 + $m2 + $lo);
   }
 }
 
 sub oload_xor {
-  if(IVSIZE_IS_8) {
-    my($_1, $_2) = (shift, shift);
 
-    die "^ not done on negative value ($_1)"
-      if $_1 < 0;
-    die "^ not done on negative value ($_2)"
-      if $_2 < 0;
+  my($_1, $_2) = (shift, shift);
+
+  die "^ not done on negative value ($_1)"
+    if $_1 < 0;
+  die "^ not done on negative value ($_2)"
+    if $_2 < 0;
+
+  if(IVSIZE_IS_8) {
 
     my($hi_1, $lo_1) = hi_lo($_1);
     my($hi_2, $lo_2) = hi_lo($_2);
@@ -300,22 +339,38 @@ sub oload_xor {
     return Math::Int113->new($hi + $lo);
   }
   else {
-    die "Bitwise (^) operations not yet implemented when $Config{ivsize} is 4";
+
+    my($hi_1, $m1_1, $m2_1, $lo_1) = hi_lo($_1);
+    my($hi_2, $m1_2, $m2_2, $lo_2) = hi_lo($_2);
+
+    my $hi = $hi_1->{val} ^ $hi_2->{val};
+    $hi *= 2 ** 96;
+
+    my $m1 = $m1_1->{val} ^ $m1_2->{val};
+    $m1 *= 2 ** 64;
+
+    my $m2 = $m2_1->{val} ^ $m2_2->{val};
+    $m2 *= 2 ** 32;
+
+    my $lo = $lo_1->{val} ^ $lo_2->{val};
+
+    return Math::Int113->new($hi + $m1 + $m2 + $lo);
   }
 }
 
 sub oload_not {
-  if(IVSIZE_IS_8) {
-    my($_1) = (shift);
 
-    die "~ not done on negative value ($_1)"
-      if $_1 < 0;
+  my($_1) = (shift);
+
+  die "~ not done on negative value ($_1)"
+    if $_1 < 0;
+  if(IVSIZE_IS_8) {
 
     my($hi_1, $lo_1) = hi_lo($_1);
 
     my $mask = (2 ** 49) - 1;
     my $hi = ~($hi_1->{val});
-    $hi &= $mask;
+    $hi &= NOT_MASK; # NOT_MASK == (2 ** 49) - 1
     $hi *= 2 ** 64;
 
     my $lo = ~($lo_1->{val});
@@ -323,12 +378,28 @@ sub oload_not {
     return Math::Int113->new($hi + $lo);
   }
   else {
-    die "Bitwise (~) operations not yet implemented when $Config{ivsize} is 4";
+
+    my($hi_1, $m1_1, $m2_1, $lo_1) = hi_lo($_1);
+
+    my $hi = ~($hi_1->{val});
+    $hi &= NOT_MASK; # NOT_MASK == (2 ** 17) - 1
+    $hi *= 2 ** 96;
+
+    my $m1 = ~($m1_1->{val});
+    $m1 *= 2 **64;
+
+    my $m2 = ~($m2_1->{val});
+    $m2 *= 2 **32;
+
+    my $lo = ~($lo_1->{val});
+
+    return Math::Int113->new($hi + $m1 + $m2 + $lo);
   }
 }
 
 sub hi_lo {
-  my($hi, $lo, $obj);
+
+  my $obj;
   if(ref($_[0]) eq 'Math::Int 113') {
     $obj = shift;
   }
@@ -336,11 +407,29 @@ sub hi_lo {
     $obj = Math::Int113->new(shift);
   }
 
-  $hi = $obj >> 64;
-  my $intermediate = $hi * (2 ** 64);
-  $lo = $obj - $intermediate;
+  if(IVSIZE_IS_8) {
+    my($hi, $lo);
+    $hi = $obj >> 64;
+    my $intermediate = $hi << 64;
+    $lo = $obj - $intermediate;
+    return ($hi, $lo);
+  }
+  else {
+    # We use $lo as a variable to hold
+    # various intermediate values. At the
+    # end it holds the value of the 32
+    # least significant bits.
+    my($hi, $m1, $m2, $lo);
+    $hi = $obj >> 96;
+    $lo = $obj - ($hi << 96);
+    $m1 = $lo >> 64;
 
-  return ($hi, $lo);
+    $lo -= $m1 << 64;
+    $m2 = $lo >> 32;
+
+    $lo -= $m2 << 32;
+    return ($hi, $m1, $m2, $lo);
+  }
 }
 1;
 
