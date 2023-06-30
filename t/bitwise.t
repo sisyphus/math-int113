@@ -4,17 +4,15 @@ use Math::Int113;
 use Config;
 
 use Test::More;
+my($obj1, $obj2);
 
-my $obj1 = Math::Int113->new(~0) * 54321;
-my $obj2 = Math::Int113->new(~0) * 12345;
-
-if($Config{ivsize} != 8) {
-  # TODO: test '>>' and '<<', which are available when ivsize is 4
-  eval {my $x = ~(Math::Int113->new(2 ** 12));};
-  like($@, qr/Bitwise \(~\) operations not yet implemented/, "Bitwise operation fails as expected");
-  warn "Skipping remaining tests - bitwise operators not yet available when ivsize is not 8\n";
-  done_testing();
-  exit 0;
+if(Math::Int113::IVSIZE_IS_8) {
+  $obj1 = Math::Int113->new(~0) * 54321;
+  $obj2 = Math::Int113->new(~0) * 12345;
+}
+else {
+  $obj1 = Math::Int113->new(18446744073709551615) * 54321;
+  $obj2 = Math::Int113->new(18446744073709551615) * 12345;
 }
 
 cmp_ok($obj1, '==', 1002045584827976553278415, "1st object assigned correctly");
