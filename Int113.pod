@@ -17,15 +17,18 @@
 
   use Math::Int113;
 
-  A Math::Int113 object holds, by definition, an integer value in the range
-  -10384593717069655257060992658440192 .. 10384593717069655257060992658440192.
+  A Math::Int113 object holds, by definition, an (113-bit) integer value in
+  the range:
+  -10384593717069655257060992658440192 .. 10384593717069655257060992658440192
+
+  All integer values in that range are representable as Math::Int113 objects.
 
   Any perl scalar, $x, will be evaluated as int($x), except for scalars used
   in '**' and '**=' operations, where they will be evaluated as per normal.
   This allows (eg) for $obj**0.5 to be evlauated as int(sqrt($obj)) rather
   simply as $obj**0 (which is 1).
 
-  my $a = Math::NumOnly->new('123.5') # $a holds value of 123
+  my $a = Math::Int113->new('123.5') # $a holds value of 123
   my $b = $a + 42.5; # $b holds value of 165
   $b += 35;          # $b holds value of 200
   print $b, "\n";    # prints 200
@@ -35,16 +38,13 @@
 
 =head1 FUNCTIONS
 
-  No functions are provided, except for the subroutines that are responsible
-  for overloading the  '+', '-', '*', '/', '**', '++', '--', '>=', '<=',
-  '==', '!=', '>', '<', '<=>', '""', '+=', '-=', '*=', '/=', '**=',
-  '<<', '>>', '&', '|', '^', '~', '<<=', '>>=', '&=', '|=', '^=', and
-  perhaps other operations.
+  No functions are provided, except for new() and the subroutines that are
+  responsible for overloading the  '+', '-', '*', '/', '**', '++', '--',
+  '>=', '<=', '==', '!=', '>', '<', '<=>', '""', '+=', '-=', '*=', '/=',
+  '**=', '<<', '>>', '&', '|', '^', '~', '<<=', '>>=', '&=', '|=', '^='
+  (and perhaps other) operations.
 
-  Note: The bitwise operators (&, |, ^, ~) are currently not available
-        on perls whose ivsize ($Config{ivsize}) is 4.
-
-=head1 LICENSE
+head1 LICENSE
 
   This program is free software; you may redistribute it and/or
   modify it under the same terms as Perl itself.
