@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Config;
 
-$Math::Int113::VERSION = '0.01';
+$Math::Int113::VERSION = '0.02';
 
 use constant IVSIZE_IS_8  => $Config{ivsize} == 8 ? 1 : 0;
 
