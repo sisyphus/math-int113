@@ -5,7 +5,7 @@ use Config;
 
 use Test::More;
 
-cmp_ok($Math::Int113::VERSION, 'eq', '0.01', "version number is as expected");
+cmp_ok($Math::Int113::VERSION, 'eq', '0.02', "version number is as expected");
 
 my $obj1 = Math::Int113->new(~0);
 
