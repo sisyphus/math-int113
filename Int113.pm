@@ -56,13 +56,14 @@ sub new {
     my($package, $filename, $line) = caller;
     warn "overlow in package $package, file $filename, at line $line\n";
     die "Arg (", sprintf("%.36g", $v), "), given to new(), overflows 113 bits";
-  }
+    }
   my %h = ('val' => int($v));
   return bless(\%h, 'Math::Int113');
 }
 
 sub overflows {
   my $v = shift;
+  return 0 if $v != $v; # NaN
   return 1
     if($v >=  1.0384593717069655257060992658440192e34 ||
        $v <= -1.0384593717069655257060992658440192e34);
