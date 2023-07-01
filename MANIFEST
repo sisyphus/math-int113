@@ -4,3 +4,4 @@ Int113.pm
 Int113.pod
 t/basic.t
 t/bitwise.t
+t/corner_cases.t
