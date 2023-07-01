@@ -4,3 +4,11 @@ Changes file for Math::Int113
  - first release
 
 0.02
+ - Alter the allowed range of values from:
+   -10384593717069655257060992658440192 .. 10384593717069655257060992658440192
+   to:
+   -10384593717069655257060992658440191 .. 10384593717069655257060992658440191
+   This is done because +/-1038...193 rounds to +/-1038...192.
+
+ - Handle NaN.
+
