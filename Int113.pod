@@ -19,9 +19,18 @@
 
   A Math::Int113 object holds, by definition, an (113-bit) integer value in
   the range:
-  -10384593717069655257060992658440192 .. 10384593717069655257060992658440192
+  -10384593717069655257060992658440191 .. 10384593717069655257060992658440191
 
   All integer values in that range are representable as Math::Int113 objects.
+
+  -10384593717069655257060992658440192 and 10384593717069655257060992658440192
+  are both also exactly representable, but we exclude them because
+  -10384593717069655257060992658440193 and 10384593717069655257060992658440193
+  round to (respectively) the same values.
+
+  Inf and NaN values will cause fatal errors. (Both will be reported as
+  "overflows", though this is perhaps not strictly accurate with respect
+  to NaN.)
 
   Any perl scalar, $x, will be evaluated as int($x), except for scalars used
   in '**' and '**=' operations, where they will be evaluated as per normal.
