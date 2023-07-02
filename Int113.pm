@@ -63,7 +63,7 @@ sub new {
 
 sub overflows {
   my $v = shift;
-  return 0 if $v != $v; # NaN
+  return 1 if $v != $v; # NaN
   return 1
     if($v >=  1.0384593717069655257060992658440192e34 ||
        $v <= -1.0384593717069655257060992658440192e34);
