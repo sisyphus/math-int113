@@ -23,4 +23,19 @@ like ($@, qr/overflows 113 bits/, '10384593717069655257060992658440192 overflows
 eval { my $x = Math::Int113->new(-10384593717069655257060992658440192);};
 like ($@, qr/overflows 113 bits/, '-10384593717069655257060992658440192 overflows');
 
+my $inf = 99 ** (99 ** 99);
+
+eval { my $x = Math::Int113->new($inf);};
+like ($@, qr/overflows 113 bits/, 'Inf overflows');
+
+eval { my $x = Math::Int113->new(-$inf);};
+like ($@, qr/overflows 113 bits/, '-Inf overflows');
+
+my $nan = $inf /  $inf;
+
+if($nan != $nan) {
+  eval { my $x = Math::Int113->new($nan);};
+  like ($@, qr/overflows 113 bits/, 'NaN overflows');
+}
+
 done_testing();
