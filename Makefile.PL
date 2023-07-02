@@ -5,7 +5,13 @@ use ExtUtils::MakeMaker;
 use 5.022; # $Config{longdblkind} is available.
 
 if($Config::Config{nvtype} ne '__float128') {
-   if($Config::Config{nvtype} ne 'long double' &&
+
+   if($Config::Config{nvtype} eq 'double') {
+      warn "Bailing out: NV must be either IEEE 754 long double or __float128";
+      exit 0;
+   }
+
+   if($Config::Config{nvtype} eq 'long double' &&
       $Config::Config{longdblkind} != 1        &&
       $Config::Config{longdblkind} != 2) {
       warn "Bailing out: NV must be either IEEE 754 long double or __float128";
