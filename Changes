@@ -1,14 +1,18 @@
 Changes file for Math::Int113
 
-0.01
- - first release
-
 0.02
+ - Fix Makefile.PL to disallow builds on perls whose nvtype is the 80-bit
+   extended precision long double.
+
  - Alter the allowed range of values from:
    -10384593717069655257060992658440192 .. 10384593717069655257060992658440192
    to:
    -10384593717069655257060992658440191 .. 10384593717069655257060992658440191
-   This is done because +/-1038...193 rounds to +/-1038...192.
+   This is done because +/-1038...193 is also assigned as +/-1038...192.
 
  - Handle NaN.
+
+0.01
+ - first release
+
 
