@@ -1,6 +1,7 @@
 Changes file for Math::Int113
 
 0.03
+ - Disallow left shifts and right shifts of more than 112 places.
 
 0.02
  - Fix Makefile.PL to disallow builds on perls whose nvtype is the 80-bit
