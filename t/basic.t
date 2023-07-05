@@ -63,4 +63,10 @@ cmp_ok($obj2, '>=', 120892581960759230028842188800, "overload '>=' ok with equiv
 cmp_ok(Math::Int113->new(0.9999), '==', 0, "0.9999 treated as 0");
 cmp_ok(Math::Int113->new('0.9999' . ('9' x 60)), '==', 1, "'0.9999' . ('9' x 60) treated as 1");
 
+eval { my $x = Math::Int113->new(42) >> 113;};
+like ($@, qr/exceeds 112/, ">> 113 disallowed");
+
+eval { my $x = Math::Int113->new(42) << 113;};
+like ($@, qr/exceeds 112/, "<< 113 disallowed");
+
 done_testing();
