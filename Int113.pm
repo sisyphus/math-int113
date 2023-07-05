@@ -210,6 +210,8 @@ sub oload_rshift {
     if $_1 < 0;
   die "Cannot right shift by a negative amount ($_2)"
     if $_2 < 0;
+  die "Specified right shift amount ($_2) exceeds 112"
+    if $_2 >= 113;
 
   if(ref($_2) eq 'Math::Int113') {
     return $_1 / (2 ** ($_2->{val}));
@@ -227,6 +229,9 @@ sub oload_lshift {
     if $_1 < 0;
   die "Cannot left shift by a negative amount ($_2)"
     if $_2 < 0;
+  die "Specified left shift amount ($_2) exceeds 112"
+    if $_2 >= 113;
+
 
   if(ref($_2) eq 'Math::Int113') {
     return $_1 * (2 ** ($_2->{val}));
