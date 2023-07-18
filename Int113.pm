@@ -3,6 +3,9 @@ use strict;
 use warnings;
 use Config;
 
+require Exporter;
+*import = \&Exporter::import;
+
 $Math::Int113::VERSION = '0.03';
 
 use constant IVSIZE_IS_8  => $Config{ivsize} == 8 ? 1 : 0;
@@ -34,6 +37,17 @@ use overload
 '<<'   => \&oload_lshift,
 ;
 
+##############################################
+my @tagged = qw(
+    coverage
+    );
+
+@Math::Int113::EXPORT = ();
+@Math::Int113::EXPORT_OK = @tagged;
+
+%Math::Int113::EXPORT_TAGS = (all => \@tagged);
+#############################################
+
 if($Config{nvtype} ne '__float128') {
    if($Config{nvtype} ne 'long double' &&
       $Config{longdblkind} != 1        &&
@@ -54,7 +68,7 @@ sub new {
   my $v = shift;
     if(overflows($v)) {
     my($package, $filename, $line) = caller;
-    warn "overlow in package $package, file $filename, at line $line\n";
+    warn "overflow in package $package, file $filename, at line $line\n";
     die "Arg (", sprintf("%.36g", $v), "), given to new(), overflows 113 bits";
     }
   my %h = ('val' => int($v));
@@ -437,5 +451,26 @@ sub hi_lo {
     return ($hi, $m1, $m2, $lo);
   }
 }
+
+sub coverage {
+  my($iv_bits, $nv_prec, $max_prec) = (shift, shift, shift);
+  return ( (2**$iv_bits)-1, 0 ) if $iv_bits >= $max_prec;
+
+  my $integer_max = (2**$max_prec) - 1;
+  $max_prec--;
+
+  my $rep = (2**$iv_bits) - 1;
+
+  for my $v($iv_bits..$max_prec) { $rep += (2 ** _min($v,$nv_prec)) }
+  my $unrep = $integer_max - $rep;
+  return ( sprintf("%.36g", $rep), sprintf("%.36g", $unrep) );
+}
+
+sub _min {
+  my($v1, $v2) = (shift, shift);
+  return $v1 if $v1 <= $v2;
+  return $v2;
+}
+
 1;
 
