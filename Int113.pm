@@ -19,6 +19,7 @@ use overload
 '-'    => \&oload_sub,
 '*'    => \&oload_mul,
 '/'    => \&oload_div,
+'%'    => \&oload_mod,
 '**'   => \&oload_pow,
 '++'   => \&oload_inc,
 '--'   => \&oload_dec,
@@ -134,6 +135,22 @@ sub oload_div {
   return Math::Int113->new(int(int($_2) / $_1->{val}))
     if $_3;
   return Math::Int113->new(int($_1->{val} / int($_2)));
+}
+
+sub oload_mod {
+  my($_1, $_2, $_3) = (shift, shift, shift);
+  if(ref($_2) eq 'Math::Int113') {
+    return Math::Int113->new($_2->{val} % $_1->{val})
+      if $_3;
+    return Math::Int113->new($_1->{val} % $_2->{val})
+  }
+
+  die "Overflow in arg (", sprintf("%.36g", $_2), ") given to overloaded modulus"
+    if overflows(int($_2));
+
+  return Math::Int113->new(int($_2) % $_1->{val})
+    if $_3;
+  return Math::Int113->new($_1->{val} % int($_2));
 }
 
 sub oload_pow {
@@ -459,7 +476,9 @@ sub coverage {
   my $integer_max = (2**$max_prec) - 1;
   $max_prec--;
 
-  my $rep = (2**$iv_bits) - 1;
+  my $rep = (2**$iv_bits) - 1; # All values in 1..(2**$iv_bits)-1 are
+                               # representable - though this might not be
+                               # so for the range -((2**$iv_bits)-1..-1.
 
   for my $v($iv_bits..$max_prec) { $rep += (2 ** _min($v,$nv_prec)) }
   my $unrep = $integer_max - $rep;
