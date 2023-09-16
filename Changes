@@ -1,6 +1,7 @@
 Changes file for Math::Int113
 
 0.03
+ - Overload '%' operation.
  - Disallow left shifts and right shifts of more than 112 places.
  - Add coverage() function.
 
