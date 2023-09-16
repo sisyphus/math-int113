@@ -6,7 +6,7 @@ use Config;
 require Exporter;
 *import = \&Exporter::import;
 
-$Math::Int113::VERSION = '0.03';
+$Math::Int113::VERSION = '0.04';
 
 use constant IVSIZE_IS_8  => $Config{ivsize} == 8 ? 1 : 0;
 
