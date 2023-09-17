@@ -5,8 +5,11 @@ use Config;
 
 require Exporter;
 *import = \&Exporter::import;
+require DynaLoader;
 
 $Math::Int113::VERSION = '0.04';
+Math::Int113->DynaLoader::bootstrap($Math::Int113::VERSION);
+sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
 use constant IVSIZE_IS_8  => $Config{ivsize} == 8 ? 1 : 0;
 
@@ -77,6 +80,8 @@ sub new {
 }
 
 sub overflows {
+  # This is a private sub. No need to check initialization in here.
+  no warnings 'uninitialized';
   my $v = shift;
   return 1 if $v != $v; # NaN
   return 1
