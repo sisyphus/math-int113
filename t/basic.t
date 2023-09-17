@@ -93,4 +93,16 @@ like ($@, qr/exceeds 112/, ">> 113 disallowed");
 eval { my $x = Math::Int113->new(42) << 113;};
 like ($@, qr/exceeds 112/, "<< 113 disallowed");
 
+my $expected_refcnt = 1;
+$expected_refcnt++
+  if $Config{ccflags} =~ /\-DPERL_RC_STACK/;
+
+cmp_ok(Math::Int113::get_refcnt($obj1), '==', $expected_refcnt, '$obj1 reference count ok');
+cmp_ok(Math::Int113::get_refcnt($obj2), '==', $expected_refcnt, '$obj2 reference count ok');
+cmp_ok(Math::Int113::get_refcnt($num),  '==', $expected_refcnt, '$num reference count ok' );
+cmp_ok(Math::Int113::get_refcnt($div),  '==', $expected_refcnt, '$div reference count ok' );
+cmp_ok(Math::Int113::get_refcnt($rem),  '==', $expected_refcnt, '$rem reference count ok' );
+cmp_ok(Math::Int113::get_refcnt($mnum), '==', $expected_refcnt, '$mnum reference count ok');
+cmp_ok(Math::Int113::get_refcnt($mdiv), '==', $expected_refcnt, '$mdiv reference count ok');
+
 done_testing();
