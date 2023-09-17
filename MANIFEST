@@ -2,6 +2,7 @@ MANIFEST
 Makefile.PL
 Int113.pm
 Int113.pod
+Int113.xs
 t/basic.t
 t/bitwise.t
 t/corner_cases.t
