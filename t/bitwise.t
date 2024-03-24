@@ -50,4 +50,9 @@ cmp_ok($not_zero, '==', 2 ** 113, '~(Math::Int113->new(0)) increments to 2**113'
 $not_zero--;
 cmp_ok($not_zero, '==', ~(Math::Int113->new(0)), 'Math::Int113->new(2**113) decrements to ~(Math::Int113->new(0))');
 
+my $other = Math::Int113->new('12345678909876543212345');
+my $not_other = ~$other;
+cmp_ok($not_zero - $not_other, '==', $other, '~0 - ~$x == $x');
+cmp_ok(~(Math::Int113->new(64)) - ~(Math::Int113->new(125)), '==', 61, '~64 - ~125 == 61');
+
 done_testing();
