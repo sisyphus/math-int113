@@ -43,7 +43,7 @@ use overload
 
 ##############################################
 my @tagged = qw(
-    coverage
+    coverage divmod
     );
 
 @Math::Int113::EXPORT = ();
@@ -156,6 +156,16 @@ sub oload_mod {
   return Math::Int113->new(int($_2) % $_1->{val})
     if $_3;
   return Math::Int113->new($_1->{val} % int($_2));
+}
+
+sub divmod {
+  my ($_1, $_2) = (shift, shift);
+  # Convert given args to Math::Int113 objects (if they are not already).
+  $_1 = Math::Int113->new($_1) unless ref $_1 eq 'Math::Int113';
+  $_2 = Math::Int113->new($_2) unless ref $_2 eq 'Math::Int113';
+  # Return the result as a list of 2 Math::Int113 objects.
+  return ( $_1 / $_2,
+           $_1 % $_2 );
 }
 
 sub oload_pow {

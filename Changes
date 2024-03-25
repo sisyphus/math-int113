@@ -1,6 +1,7 @@
 Changes file for Math::Int113
 
 0.04
+ - Add divmod() function.
  - Add new test file t/bitwise_feature.t
 
 0.03

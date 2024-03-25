@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Math::Int113;
+use Math::Int113 qw(divmod);
 use Test::More;
 
 eval {require Math::GMPz;};
@@ -38,5 +38,55 @@ for(1..100) {
   $msg = sprintf("%s %% %s == %s", $num, $mdiv, $mod);
   cmp_ok("$mod", 'eq', "$zmod", "4: $msg");
 }
+
+
+my ($div, $mod) = divmod((2 ** 105) + 123456789, (2 ** 65) + 987654321);
+cmp_ok(ref($div), 'eq', 'Math::Int113', '1: division in divmod returns Math::Int113 object');
+cmp_ok(ref($mod), 'eq', 'Math::Int113', '1: modulus in divmod returns Math::Int113 object');
+cmp_ok($div, '==', 1099511627746, '1: division done correctly in divmod');
+cmp_ok($mod, '==', 20867234289616163283, '1: modulus done correctly in divmod');
+
+($div, $mod) = divmod((2 ** 105) + 123456789, -((2 ** 65) + 987654321));
+cmp_ok(ref($div), 'eq', 'Math::Int113', '2: division in divmod returns Math::Int113 object');
+cmp_ok(ref($mod), 'eq', 'Math::Int113', '2: modulus in divmod returns Math::Int113 object');
+cmp_ok($div, '==', -1099511627746, '2: division done correctly in divmod');
+cmp_ok($mod, '==', -16026253858790594270, '2: modulus done correctly in divmod');
+
+($div, $mod) = divmod(-((2 ** 105) + 123456789), (2 ** 65) + 987654321);
+cmp_ok(ref($div), 'eq', 'Math::Int113', '3: division in divmod returns Math::Int113 object');
+cmp_ok(ref($mod), 'eq', 'Math::Int113', '3: modulus in divmod returns Math::Int113 object');
+cmp_ok($div, '==', -1099511627746, '3: division done correctly in divmod');
+cmp_ok($mod, '==', 16026253858790594270, '3: modulus done correctly in divmod');
+
+($div, $mod) = divmod(-((2 ** 105) + 123456789), -((2 ** 65) + 987654321));
+cmp_ok(ref($div), 'eq', 'Math::Int113', '4: division in divmod returns Math::Int113 object');
+cmp_ok(ref($mod), 'eq', 'Math::Int113', '4: modulus in divmod returns Math::Int113 object');
+cmp_ok($div, '==', 1099511627746, '4: division done correctly in divmod');
+cmp_ok($mod, '==', -20867234289616163283, '4: modulus done correctly in divmod');
+
+my ($div, $mod) = divmod((2 ** 105) + 123456789.8, (2 ** 65) + 987654321.8);
+cmp_ok(ref($div), 'eq', 'Math::Int113', '5: division in divmod returns Math::Int113 object');
+cmp_ok(ref($mod), 'eq', 'Math::Int113', '5: modulus in divmod returns Math::Int113 object');
+cmp_ok($div, '==', 1099511627746, '5: division done correctly in divmod');
+cmp_ok($mod, '==', 20867234289616163283, '5: modulus done correctly in divmod');
+
+($div, $mod) = divmod((2 ** 105) + 123456789.8, -((2 ** 65) + 987654321.8));
+cmp_ok(ref($div), 'eq', 'Math::Int113', '6: division in divmod returns Math::Int113 object');
+cmp_ok(ref($mod), 'eq', 'Math::Int113', '6: modulus in divmod returns Math::Int113 object');
+cmp_ok($div, '==', -1099511627746, '6: division done correctly in divmod');
+cmp_ok($mod, '==', -16026253858790594270, '6: modulus done correctly in divmod');
+
+($div, $mod) = divmod(-((2 ** 105) + 123456789.8), (2 ** 65) + 987654321.8);
+cmp_ok(ref($div), 'eq', 'Math::Int113', '7: division in divmod returns Math::Int113 object');
+cmp_ok(ref($mod), 'eq', 'Math::Int113', '7: modulus in divmod returns Math::Int113 object');
+cmp_ok($div, '==', -1099511627746, '7: division done correctly in divmod');
+cmp_ok($mod, '==', 16026253858790594270, '7: modulus done correctly in divmod');
+
+($div, $mod) = divmod(-((2 ** 105) + 123456789.8), -((2 ** 65) + 987654321.8));
+cmp_ok(ref($div), 'eq', 'Math::Int113', '8: division in divmod returns Math::Int113 object');
+cmp_ok(ref($mod), 'eq', 'Math::Int113', '8: modulus in divmod returns Math::Int113 object');
+cmp_ok($div, '==', 1099511627746, '8: division done correctly in divmod');
+cmp_ok($mod, '==', -20867234289616163283, '8: modulus done correctly in divmod');
+
 
 done_testing();
