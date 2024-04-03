@@ -87,11 +87,11 @@ cmp_ok($num, '==', $rem, "overload '%=' with NV numerator ok");
 $num %= Math::Int113->new(9384593717069655257060992660);
 cmp_ok($num, '==', 615406282930344742939007376, "overload '%=' ok");
 
-eval { my $x = Math::Int113->new(42) >> 113;};
-like ($@, qr/exceeds 112/, ">> 113 disallowed");
+my $x = Math::Int113->new(42) >> 113;
+cmp_ok($x, '==', 0, ">> 113 returns 0");
 
-eval { my $x = Math::Int113->new(42) << 113;};
-like ($@, qr/exceeds 112/, "<< 113 disallowed");
+$x = Math::Int113->new(42) << 113;
+cmp_ok($x, '==', 0, "<< 113 returns 0");
 
 my $expected_refcnt = 1;
 $expected_refcnt++

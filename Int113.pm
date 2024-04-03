@@ -252,12 +252,10 @@ sub oload_stringify {
 sub oload_rshift {
   my($_1, $_2) = (shift, shift);
 
-  die ">> not done on negative value ($_1)"
-    if $_1 < 0;
-  die "Cannot right shift by a negative amount ($_2)"
-    if $_2 < 0;
-  die "Specified right shift amount ($_2) exceeds 112"
-    if $_2 >= 113;
+  # Assuming that $_1 is always a Math::Int113 object. (Needs to be checked.)
+  $_1 = ~(-$_1) + 1              if $_1 < 0; # 2s-complement
+  return oload_lshift($_1, -$_2) if $_2 < 0;
+  return Math::Int113->new(0)    if $_2 >= 113;
 
   if(ref($_2) eq 'Math::Int113') {
     return $_1 / (2 ** ($_2->{val}));
@@ -271,12 +269,10 @@ sub oload_rshift {
 sub oload_lshift {
   my($_1, $_2) = (shift, shift);
 
-  die "<< not done on negative value ($_1)"
-    if $_1 < 0;
-  die "Cannot left shift by a negative amount ($_2)"
-    if $_2 < 0;
-  die "Specified left shift amount ($_2) exceeds 112"
-    if $_2 >= 113;
+  # Assuming that $_1 is always a Math::Int113 object. (Needs to be checked.)
+  $_1 = ~(-$_1) + 1              if $_1 < 0; # 2s-complement
+  return oload_rshift($_1, -$_2) if $_2 < 0;
+  return Math::Int113->new(0)    if $_2 >= 113;
 
 
   if(ref($_2) eq 'Math::Int113') {
@@ -292,10 +288,11 @@ sub oload_and {
 
   my($_1, $_2) = (shift, shift);
 
-  die "& not done on negative value ($_1)"
-    if $_1 < 0;
-  die "& not done on negative value ($_2)"
-    if $_2 < 0;
+  $_1 = ~(-$_1) + 1 if $_1 < 0; # 2s-complement
+  if($_2 < 0) {
+    if(ref($_2) eq 'Math::Int113') { $_2 = ~(-$_2) + 1 } # 2s-complement
+    else { $_2 = ~(Math::Int113->new(-$_2)) + 1 }        # 2s-complement
+  }
 
   if(IVSIZE_IS_8) {
     my($hi_1, $lo_1) = hi_lo($_1);
@@ -332,10 +329,11 @@ sub oload_or {
 
   my($_1, $_2) = (shift, shift);
 
-  die "| not done on negative value ($_1)"
-    if $_1 < 0;
-  die "| not done on negative value ($_2)"
-    if $_2 < 0;
+  $_1 = ~(-$_1) + 1 if $_1 < 0; # 2s-complement
+  if($_2 < 0) {
+    if(ref($_2) eq 'Math::Int113') { $_2 = ~(-$_2) + 1 } # 2s-complement
+    else { $_2 = ~(Math::Int113->new(-$_2)) + 1 }        # 2s-complement
+  }
 
   if(IVSIZE_IS_8) {
 
@@ -373,10 +371,11 @@ sub oload_xor {
 
   my($_1, $_2) = (shift, shift);
 
-  die "^ not done on negative value ($_1)"
-    if $_1 < 0;
-  die "^ not done on negative value ($_2)"
-    if $_2 < 0;
+  $_1 = ~(-$_1) + 1 if $_1 < 0; # 2s-complement
+  if($_2 < 0) {
+    if(ref($_2) eq 'Math::Int113') { $_2 = ~(-$_2) + 1 } # 2s-complement
+    else { $_2 = ~(Math::Int113->new(-$_2)) + 1 }        # 2s-complement
+  }
 
   if(IVSIZE_IS_8) {
 
@@ -414,8 +413,8 @@ sub oload_not {
 
   my($_1) = (shift);
 
-  die "~ not done on negative value ($_1)"
-    if $_1 < 0;
+  $_1 = ~(-$_1) + 1 if $_1 < 0; # 2s-complement
+
   if(IVSIZE_IS_8) {
 
     my($hi_1, $lo_1) = hi_lo($_1);

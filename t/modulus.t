@@ -64,7 +64,7 @@ cmp_ok(ref($mod), 'eq', 'Math::Int113', '4: modulus in divmod returns Math::Int1
 cmp_ok($div, '==', 1099511627746, '4: division done correctly in divmod');
 cmp_ok($mod, '==', -20867234289616163283, '4: modulus done correctly in divmod');
 
-my ($div, $mod) = divmod((2 ** 105) + 123456789.8, (2 ** 65) + 987654321.8);
+($div, $mod) = divmod((2 ** 105) + 123456789.8, (2 ** 65) + 987654321.8);
 cmp_ok(ref($div), 'eq', 'Math::Int113', '5: division in divmod returns Math::Int113 object');
 cmp_ok(ref($mod), 'eq', 'Math::Int113', '5: modulus in divmod returns Math::Int113 object');
 cmp_ok($div, '==', 1099511627746, '5: division done correctly in divmod');

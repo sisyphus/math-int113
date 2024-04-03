@@ -55,4 +55,51 @@ my $not_other = ~$other;
 cmp_ok($not_zero - $not_other, '==', $other, '~0 - ~$x == $x');
 cmp_ok(~(Math::Int113->new(64)) - ~(Math::Int113->new(125)), '==', 61, '~64 - ~125 == 61');
 
+# Test bit-logic operations on -ve values.
+
+my $lim = ~0 >> 1;
+
+for(1..100) {
+  my $p = int(rand(~0));
+  my $n = int(rand($lim));
+  $n *= -1;
+  my $pint113 = Math::Int113->new($p);
+  my $nint113 = Math::Int113->new($n);
+  cmp_ok(~$nint113, '==', ~$n, "~($nint113) correctly calculated");
+
+  my $nint113_alt = ~(-$nint113) + 1;
+
+  my $expected = $p & $n;
+  cmp_ok($pint113 & $n, '==', $expected, "1: $p & $n correctly calculated");
+  cmp_ok($pint113 & $nint113, '==', $expected, "2: $p & $n correctly calculated");
+  cmp_ok($pint113 & $nint113_alt, '==', $expected, "3: $p & $n correctly calculated");
+
+  $expected = $p ^ $nint113;
+  cmp_ok($pint113 ^ $n, '==', $expected, "1: $p ^ $n correctly calculated");
+  cmp_ok($pint113 ^ $nint113, '==', $expected, "2: $p ^ $n correctly calculated");
+  cmp_ok($pint113 ^ $nint113_alt, '==', $expected, "3: $p ^ $n correctly calculated");
+
+  $expected = $p | $nint113;
+  cmp_ok($pint113 | $n, '==', $expected, "1: $p | $n correctly calculated");
+  cmp_ok($pint113 | $nint113, '==', $expected, "2: $p | $n correctly calculated");
+  cmp_ok($pint113 | $nint113_alt, '==', $expected, "3: $p | $n correctly calculated");
+
+}
+
+for(1 .. 10) {
+  my $v = int(rand(~0));
+  my $pobj = Math::Int113->new($v);
+  my $nobj = Math::Int113->new(-$v);
+  my $nobj_alt = ~(-$nobj) + 1;
+  my $pshift = 1 + int(rand(8));
+  my $nshift = -$pshift;
+
+  cmp_ok($pobj >> $nshift, '==', $pobj << $pshift, "$pobj >> $nshift == << $pshift");
+  cmp_ok($pobj << $nshift, '==', $pobj >> $pshift, "$pobj << $nshift == >> $pshift");
+  cmp_ok($nobj << $nshift, '==', $nobj_alt << $nshift, "$nobj << $nshift == ~-$nobj+1 << $nshift");
+  #cmp_ok($nobj >> $nshift, '==', $nobj_alt >> $nshift, "$nobj >> $nshift == ~-$nobj+1 >> $nshift"); # typically overflows Int113
+  #cmp_ok($nobj << $pshift, '==', $nobj_alt << $pshift, "$nobj << $pshift == ~-$nobj+1 << $pshift"); # typically overflows Int113
+  cmp_ok($nobj >> $pshift, '==', $nobj_alt >> $pshift, "$nobj >> $pshift == ~-$nobj+1 >> $pshift");
+}
+
 done_testing();
