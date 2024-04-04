@@ -105,4 +105,18 @@ cmp_ok(Math::Int113::get_refcnt($rem),  '==', $expected_refcnt, '$rem reference 
 cmp_ok(Math::Int113::get_refcnt($mnum), '==', $expected_refcnt, '$mnum reference count ok');
 cmp_ok(Math::Int113::get_refcnt($mdiv), '==', $expected_refcnt, '$mdiv reference count ok');
 
+for(1 .. 100) {
+  my $iv1 = int(rand(~0));
+  my $iv2 = int(rand(sqrt(~0)));
+  my $int113_1 = Math::Int113->new($iv1);
+  my $int113_2 = Math::Int113->new($iv2);
+
+  cmp_ok($iv1 & $iv2, '==', $int113_1 & $int113_2, "$iv1 & $iv2 ok");
+  cmp_ok($iv1 & $int113_2, '==', $int113_1 & $iv2, "$iv1 & $iv2 (mixed types) ok");
+  cmp_ok($iv1 | $iv2, '==', $int113_1 | $int113_2, "$iv1 | $iv2 ok");
+  cmp_ok($iv1 | $int113_2, '==', $int113_1 | $iv2, "$iv1 | $iv2 (mixed types) ok");
+  cmp_ok($iv1 ^ $iv2, '==', $int113_1 ^ $int113_2, "$iv1 ^ $iv2 ok");
+  cmp_ok($iv1 ^ $int113_2, '==', $int113_1 ^ $iv2, "$iv1 ^ $iv2 (mixed types) ok");
+}
+
 done_testing();
