@@ -250,9 +250,16 @@ sub oload_stringify {
 }
 
 sub oload_rshift {
-  my($_1, $_2) = (shift, shift);
+  my($_1, $_2, $switch);
 
-  # Assuming that $_1 is always a Math::Int113 object. (Needs to be checked.)
+  if($_[2]) {
+    ($_2, $_1, $switch) = (shift, shift, 1);    # $_1 is NOT a Math::Int113 object
+  }
+  else {
+    ($_1, $_2, $switch) = (shift, shift, 0);    # $_1 IS a Math::Int113 object
+  }
+
+  $_1 = Math::Int113->new($_1) if $switch;
   $_1 = ~(-$_1) + 1              if $_1 < 0; # 2s-complement
   return oload_lshift($_1, -$_2) if $_2 < 0;
   return Math::Int113->new(0)    if $_2 >= 113;
@@ -267,9 +274,16 @@ sub oload_rshift {
 }
 
 sub oload_lshift {
-  my($_1, $_2) = (shift, shift);
+  my($_1, $_2, $switch);
 
-  # Assuming that $_1 is always a Math::Int113 object. (Needs to be checked.)
+  if($_[2]) {
+    ($_2, $_1, $switch) = (shift, shift, 1);    # $_1 is NOT a Math::Int113 object
+  }
+  else {
+    ($_1, $_2, $switch) = (shift, shift, 0);    # $_1 IS a Math::Int113 object
+  }
+
+  $_1 = Math::Int113->new($_1) if $switch;
   $_1 = ~(-$_1) + 1              if $_1 < 0; # 2s-complement
   return oload_rshift($_1, -$_2) if $_2 < 0;
   return Math::Int113->new(0)    if $_2 >= 113;
