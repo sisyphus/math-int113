@@ -4,7 +4,7 @@ Makefile.PL
 Int113.pm
 Int113.pod
 Int113.xs
-demo/coverage.p
+
 t/basic.t
 t/bitwise.t
 t/bitwise_feature.t
