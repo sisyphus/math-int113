@@ -209,7 +209,6 @@ if($gmp) {
   }
 }
 
-
 sub complement {
   if($_[0] < 0) {
     return ($max_gmp + $_[0]) + 1;

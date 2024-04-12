@@ -97,8 +97,8 @@ for(1 .. 10) {
   cmp_ok($pobj >> $nshift, '==', $pobj << $pshift, "$pobj >> $nshift == << $pshift");
   cmp_ok($pobj << $nshift, '==', $pobj >> $pshift, "$pobj << $nshift == >> $pshift");
   cmp_ok($nobj << $nshift, '==', $nobj_alt << $nshift, "$nobj << $nshift == ~-$nobj+1 << $nshift");
-  #cmp_ok($nobj >> $nshift, '==', $nobj_alt >> $nshift, "$nobj >> $nshift == ~-$nobj+1 >> $nshift"); # typically overflows Int113
-  #cmp_ok($nobj << $pshift, '==', $nobj_alt << $pshift, "$nobj << $pshift == ~-$nobj+1 << $pshift"); # typically overflows Int113
+  cmp_ok($nobj >> $nshift, '==', $nobj_alt >> $nshift, "$nobj >> $nshift == ~-$nobj+1 >> $nshift");
+  cmp_ok($nobj << $pshift, '==', $nobj_alt << $pshift, "$nobj << $pshift == ~-$nobj+1 << $pshift");
   cmp_ok($nobj >> $pshift, '==', $nobj_alt >> $pshift, "$nobj >> $pshift == ~-$nobj+1 >> $pshift");
 }
 
@@ -113,8 +113,8 @@ for(1 .. 10) {
   cmp_ok($pobj >> $nshift, '==', $pobj << $pshift, "$pobj >> $nshift == << $pshift");
   cmp_ok($pobj << $nshift, '==', $pobj >> $pshift, "$pobj << $nshift == >> $pshift");
   cmp_ok($nobj << $nshift, '==', $nobj_alt << $nshift, "$nobj << $nshift == ~-$nobj+1 << $nshift");
-  #cmp_ok($nobj >> $nshift, '==', $nobj_alt >> $nshift, "$nobj >> $nshift == ~-$nobj+1 >> $nshift"); # typically overflows Int113
-  #cmp_ok($nobj << $pshift, '==', $nobj_alt << $pshift, "$nobj << $pshift == ~-$nobj+1 << $pshift"); # typically overflows Int113
+  cmp_ok($nobj >> $nshift, '==', $nobj_alt >> $nshift, "$nobj >> $nshift == ~-$nobj+1 >> $nshift");
+  cmp_ok($nobj << $pshift, '==', $nobj_alt << $pshift, "$nobj << $pshift == ~-$nobj+1 << $pshift");
   cmp_ok($nobj >> $pshift, '==', $nobj_alt >> $pshift, "$nobj >> $pshift == ~-$nobj+1 >> $pshift");
 }
 
@@ -128,16 +128,16 @@ for(1 .. 10) {
   $pobj ^= 10384593717069655257060992658439167;
 
   my $nobj = -$pobj;
-  my $nobj_alt = ~(-$nobj) + 1; # can overflow
+  my $nobj_alt = ~(-$nobj) + 1;
 
   my $pshift = 1 + int(rand(8));
   my $nshift = -$pshift;
 
-  cmp_ok($pobj >> $nshift, '==', $pobj << $pshift, "$pobj >> $nshift == $pobj << $pshift"); # typicaly overflows Int113
+  cmp_ok($pobj >> $nshift, '==', $pobj << $pshift, "$pobj >> $nshift == $pobj << $pshift");
   cmp_ok($pobj << $nshift, '==', $pobj >> $pshift, "$pobj << $nshift == $pobj >> $pshift");
   cmp_ok($nobj << $nshift, '==', $nobj_alt << $nshift, "$nobj << $nshift == ~-$nobj+1 << $nshift");
-  #cmp_ok($nobj >> $nshift, '==', $nobj_alt >> $nshift, "$nobj >> $nshift == ~-$nobj+1 >> $nshift"); # typically overflows Int113
-  #cmp_ok($nobj << $pshift, '==', $nobj_alt << $pshift, "$nobj << $pshift == ~-$nobj+1 << $pshift"); # typically overflows Int113
+  cmp_ok($nobj >> $nshift, '==', $nobj_alt >> $nshift, "$nobj >> $nshift == ~-$nobj+1 >> $nshift");
+  cmp_ok($nobj << $pshift, '==', $nobj_alt << $pshift, "$nobj << $pshift == ~-$nobj+1 << $pshift");
   cmp_ok($nobj >> $pshift, '==', $nobj_alt >> $pshift, "$nobj >> $pshift == ~-$nobj+1 >> $pshift");
 }
 
@@ -148,5 +148,15 @@ cmp_ok($iv >> -$shift, '==', $iv >> -5, "123456789 >> -5 == 3950617248");
 
 cmp_ok($iv >> $shift, '==', $iv >> 5, "123456789 >> 5 == 3858024");
 cmp_ok($iv << -$shift, '==', $iv << -5, "123456789 << -5 == 3858024");
+
+for(1..100) {
+  my $uv = $Math::Int113::MAX_OBJ ^ ((2 ** 110) - 1);
+  my $inc = int(rand(100));
+  $uv += $inc;
+  my $shift = 3 + int(rand(20));
+  cmp_ok($uv << $shift, '==', $inc << $shift, "\$uv << \$shift == \$inc << \$shift");
+}
+
+
 
 done_testing();

@@ -52,6 +52,8 @@ my @tagged = qw(
 %Math::Int113::EXPORT_TAGS = (all => \@tagged);
 #############################################
 
+$Math::Int113::MAX_OBJ = Math::Int113->new(1.0384593717069655257060992658440191e34);
+
 if($Config{nvtype} ne '__float128') {
    if($Config{nvtype} ne 'long double' &&
       $Config{longdblkind} != 1        &&
@@ -252,6 +254,9 @@ sub oload_stringify {
 sub oload_rshift {
   my($_1, $_2, $switch);
 
+  # If $_1 is negative, we set $_1 = ~(abs($_1)) + 1
+  # If $_2 is negative, we return oload_lshift($_1, abs($_2))
+
   if($_[2]) {
     ($_2, $_1, $switch) = (shift, shift, 1);    # $_1 is NOT a Math::Int113 object
   }
@@ -260,6 +265,10 @@ sub oload_rshift {
   }
 
   $_1 = Math::Int113->new($_1) if $switch;
+
+  # If $_1 is negative, we set $_1 = ~(abs($_1)) + 1
+  # If $_2 is negative, we return oload_lshift($_1, abs($_2))
+
   $_1 = ~(-$_1) + 1              if $_1 < 0; # 2s-complement
   return oload_lshift($_1, -$_2) if $_2 < 0;
   return Math::Int113->new(0)    if $_2 >= 113;
@@ -267,8 +276,6 @@ sub oload_rshift {
   if(ref($_2) eq 'Math::Int113') {
     return $_1 / (2 ** ($_2->{val}));
   }
-
-  # No need to throw an error if overflows($_2)
 
   return $_1 / (2 ** int($_2));
 }
@@ -284,16 +291,23 @@ sub oload_lshift {
   }
 
   $_1 = Math::Int113->new($_1) if $switch;
+
+  # If $_1 is negative, we set $_1 = ~(abs($_1)) + 1
+  # If $_2 is negative, we return oload_rshift($_1, abs($_2))
+
   $_1 = ~(-$_1) + 1              if $_1 < 0; # 2s-complement
   return oload_rshift($_1, -$_2) if $_2 < 0;
   return Math::Int113->new(0)    if $_2 >= 113;
 
+  # Avoid overflow:
+  #my $t0 = $Math::Int113::MAX_OBJ >> $_2;
+  #my $t1 = $_1 & $t0;
+  #$_1 = $t1;
+  $_1 = $_1 & ($Math::Int113::MAX_OBJ >> $_2);
 
   if(ref($_2) eq 'Math::Int113') {
     return $_1 * (2 ** ($_2->{val}));
   }
-
-  # No need to throw an error if overflows($_2)
 
   return $_1 *  (2 ** int($_2));
 }
@@ -464,20 +478,26 @@ sub oload_not {
 
 sub hi_lo {
 
-  my $obj;
+  my $de_obj;
   if(ref($_[0]) eq 'Math::Int 113') {
-    $obj = shift;
+    $de_obj = $_[0]->{val};
   }
   else {
-    $obj = Math::Int113->new(shift);
+    $de_obj = shift;
   }
 
   if(IVSIZE_IS_8) {
     my($hi, $lo);
-    $hi = $obj >> 64;
-    my $intermediate = $hi << 64;
-    $lo = $obj - $intermediate;
-    return ($hi, $lo);
+ #  ORIG
+ #   $hi = $obj >> 64;
+ #   my $intermediate = $hi << 64;
+ #   $lo = $obj - $intermediate;
+ #   return ($hi, $lo);
+ #  REPLACEMENT - avoid operator overloading
+    $hi = int($de_obj / (2 ** 64));
+    my $intermediate = $hi * (2 ** 64);
+    $lo = $de_obj - $intermediate;
+    return(Math::Int113->new($hi), Math::Int113->new($lo));
   }
   else {
     # We use $lo as a variable to hold
@@ -485,15 +505,26 @@ sub hi_lo {
     # end it holds the value of the 32
     # least significant bits.
     my($hi, $m1, $m2, $lo);
-    $hi = $obj >> 96;
-    $lo = $obj - ($hi << 96);
-    $m1 = $lo >> 64;
+ #  ORIG
+ #   $hi = $obj >> 96;
+ #   $lo = $obj - ($hi << 96);
+ #   $m1 = $lo >> 64;
+ #
+ #   $lo -= $m1 << 64;
+ #   $m2 = $lo >> 32;
+ #
+ #   $lo -= $m2 << 32;
+ #  REPLACEMENT - avoid operator overloading
+    $hi = int($de_obj / (2 ** 96));
+    $lo = $de_obj - ($hi * (2 ** 96));
+    $m1 = int($lo / (2 ** 64));
 
-    $lo -= $m1 << 64;
-    $m2 = $lo >> 32;
+    $lo -= $m1 * (2 ** 64);
+    $m2 = int($lo / (2 ** 32));
 
-    $lo -= $m2 << 32;
-    return ($hi, $m1, $m2, $lo);
+    $lo -= $m2 * (2 ** 32);
+    return (Math::Int113->new($hi), Math::Int113->new($m1),
+            Math::Int113->new($m2), Math::Int113->new($lo));
   }
 }
 
@@ -520,4 +551,60 @@ sub _min {
 }
 
 1;
+
+__END__
+
+Saving this OK version of sub hi_lo:
+
+sub hi_lo {
+
+  my $obj;
+  if(ref($_[0]) eq 'Math::Int 113') {
+    $obj = shift;
+  }
+  else {
+    $obj = Math::Int113->new(shift);
+  }
+
+  if(IVSIZE_IS_8) {
+    my($hi, $lo);
+ #  ORIG
+ #   $hi = $obj >> 64;
+ #   my $intermediate = $hi << 64;
+ #   $lo = $obj - $intermediate;
+ #   return ($hi, $lo);
+ #  REPLACEMENT - avoid operator overloading
+    $hi = int($obj->{val} / (2 ** 64));
+    my $intermediate = $hi * (2 ** 64);
+    $lo = $obj->{val} - $intermediate;
+    return(Math::Int113->new($hi), Math::Int113->new($lo));
+  }
+  else {
+    # We use $lo as a variable to hold
+    # various intermediate values. At the
+    # end it holds the value of the 32
+    # least significant bits.
+    my($hi, $m1, $m2, $lo);
+ #  ORIG
+ #   $hi = $obj >> 96;
+ #   $lo = $obj - ($hi << 96);
+ #   $m1 = $lo >> 64;
+ #
+ #   $lo -= $m1 << 64;
+ #   $m2 = $lo >> 32;
+ #
+ #   $lo -= $m2 << 32;
+ #  REPLACEMENT - avoid operator overloading
+    $hi = int($obj->{val} / (2 ** 96));
+    $lo = $obj->{val} - ($hi * (2 ** 96));
+    $m1 = int($lo / (2 ** 64));
+
+    $lo -= $m1 * (2 ** 64);
+    $m2 = int($lo / (2 ** 32));
+
+    $lo -= $m2 * (2 ** 32);
+    return (Math::Int113->new($hi), Math::Int113->new($m1),
+            Math::Int113->new($m2), Math::Int113->new($lo));
+  }
+}
 

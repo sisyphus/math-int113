@@ -111,6 +111,8 @@ for(1 .. 100) {
   my $int113_1 = Math::Int113->new($iv1);
   my $int113_2 = Math::Int113->new($iv2);
 
+#print "$iv1 $iv2\n";
+
   cmp_ok($iv1 & $iv2, '==', $int113_1 & $int113_2, "$iv1 & $iv2 ok");
   cmp_ok($iv1 & $int113_2, '==', $int113_1 & $iv2, "$iv1 & $iv2 (mixed types) ok");
   cmp_ok($iv1 | $iv2, '==', $int113_1 | $int113_2, "$iv1 | $iv2 ok");
@@ -118,5 +120,11 @@ for(1 .. 100) {
   cmp_ok($iv1 ^ $iv2, '==', $int113_1 ^ $int113_2, "$iv1 ^ $iv2 ok");
   cmp_ok($iv1 ^ $int113_2, '==', $int113_1 ^ $iv2, "$iv1 ^ $iv2 (mixed types) ok");
 }
+
+cmp_ok(Math::Int113->new(1) << 112, '==', 5192296858534827628530496329220096, 'Math::Int113->new(1) << 112 == 5192296858534827628530496329220096');
+cmp_ok(Math::Int113->new(1) << 112, '==', $Math::Int113::MAX_OBJ << 112, 'Math::Int113->new(1) << 112 == $Math::Int113::MAX_OBJ << 112');
+cmp_ok(Math::Int113->new(17) << 113, '==', 0, 'Math::Int113->new(17) << 113 == 0');
+cmp_ok(Math::Int113->new(2) << 112, '==', 0, 'Math::Int113->new(2) << 112 == 0');
+
 
 done_testing();

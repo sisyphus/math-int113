@@ -75,6 +75,16 @@
   '~', '<<=', '>>=', '&=', '|=', '^=' operations can be accessed by their
   fully qualified names.
 
+head1 BITWISE OPERATIONS ON NEGATIVE VALUES
+
+  For '<<', and '>>', a left  shift of -x is implemented as a right shift
+  of x, and a right shift of -x is implemented as a left shift of x.
+  All other negative values used in  &, |, ^, ~, <<, and >> operations
+  will be replaced by their respective 2s-complement value.
+  That is, for negative $x , we set $x = ~($x * -1) + 1 prior to
+  performing the operation.
+
+
 head1 LICENSE
 
   This program is free software; you may redistribute it and/or
