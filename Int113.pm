@@ -477,23 +477,22 @@ sub oload_not {
 }
 
 sub hi_lo {
+  # Altered, as of Math-Int113-0.04, to avoid overloaded operations.
 
   my $de_obj;
   if(ref($_[0]) eq 'Math::Int 113') {
     $de_obj = $_[0]->{val};
   }
   else {
-    $de_obj = shift;
+    $de_obj = int(shift);
+    # Because $de_obj is not derived from a Math::Int113 object we
+    # must check that its value doesn't overflow a Math::Int113 object.
+    die "Overflow in arg (", sprintf("%.36g", $de_obj), ") given to sub hi_lo"
+      if overflows($de_obj);
   }
 
   if(IVSIZE_IS_8) {
     my($hi, $lo);
- #  ORIG
- #   $hi = $obj >> 64;
- #   my $intermediate = $hi << 64;
- #   $lo = $obj - $intermediate;
- #   return ($hi, $lo);
- #  REPLACEMENT - avoid operator overloading
     $hi = int($de_obj / (2 ** 64));
     my $intermediate = $hi * (2 ** 64);
     $lo = $de_obj - $intermediate;
@@ -505,16 +504,7 @@ sub hi_lo {
     # end it holds the value of the 32
     # least significant bits.
     my($hi, $m1, $m2, $lo);
- #  ORIG
- #   $hi = $obj >> 96;
- #   $lo = $obj - ($hi << 96);
- #   $m1 = $lo >> 64;
- #
- #   $lo -= $m1 << 64;
- #   $m2 = $lo >> 32;
- #
- #   $lo -= $m2 << 32;
- #  REPLACEMENT - avoid operator overloading
+
     $hi = int($de_obj / (2 ** 96));
     $lo = $de_obj - ($hi * (2 ** 96));
     $m1 = int($lo / (2 ** 64));
