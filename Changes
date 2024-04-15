@@ -2,6 +2,7 @@ Changes file for Math::Int113
 
 0.05
  - Add README file.
+ - Fix bug in t/bitwise_gmp_cross_checks.t
 
 0.04
  - Allow negative values to be passed to bitwise operators (&, |, ^, ~, >>, <<).
