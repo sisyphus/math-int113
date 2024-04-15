@@ -1,5 +1,7 @@
 Changes file for Math::Int113
 
+0.06
+
 0.05
  - Add README file.
  - Fix bug in t/bitwise_gmp_cross_checks.t
