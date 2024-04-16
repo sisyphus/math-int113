@@ -213,7 +213,8 @@ if($gmp) {
 }
 
 if($gmpz == 0 && $gmp == 0) {
-  cmp_ok(1, '==', 1, "bogus test, run to avoid 'skipped' error");
+  warn "skipping all GMP cross checks - GMP unavailable\n";
+  cmp_ok(1, '==', 1, "bogus test run, to satisfy Test::More requirements");
 }
 
 
