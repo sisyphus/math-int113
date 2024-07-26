@@ -66,8 +66,8 @@ cmp_ok($not_zero, '==', 2 ** 113, '~(Math::Int113->new(0)) increments to 2**113'
 $not_zero--;
 cmp_ok($not_zero, '==', ~(Math::Int113->new(0)), 'Math::Int113->new(2**113) decrements to ~(Math::Int113->new(0))');
 
-if($] > 5.041001) {
-  # These tests are known to FAIL if $] <= 5.041001
+if($] > 5.041002) {
+  # These tests are known to FAIL if $] <= 5.041002
   # See https://github.com/Perl/perl5/pull/22414
 
   my $iv = 123456789;
