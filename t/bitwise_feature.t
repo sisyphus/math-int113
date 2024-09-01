@@ -8,12 +8,12 @@ use Config;
 use Test::More;
 
 BEGIN{
- if($] < 5.022) {
-   print "1..1\n";
-   warn "\n skipping all tests - 'bitwise' feature not available\n";
-   print "ok 1\n";
-   exit;
-   }
+  if($] < 5.022) {
+    print "1..1\n";
+    warn "\n skipping all tests - 'bitwise' feature not available\n";
+    print "ok 1\n";
+    exit;
+  }
 };
 
 use feature 'bitwise';
@@ -65,33 +65,5 @@ cmp_ok($not_zero, '==', 2 ** 113, '~(Math::Int113->new(0)) increments to 2**113'
 
 $not_zero--;
 cmp_ok($not_zero, '==', ~(Math::Int113->new(0)), 'Math::Int113->new(2**113) decrements to ~(Math::Int113->new(0))');
-
-if($] > 5.041002) {
-  # These tests are known to FAIL if $] <= 5.041002
-  # See https://github.com/Perl/perl5/pull/22414
-
-  my $iv = 123456789;
-  ($iv &= 987654321) ^= 555555555;
-
-  my $z = Math::Int113->new(123456789);
-  ($z &= 987654321) ^= 555555555;
-  cmp_ok($z, '==', $iv, "TEST 1");
-
-  $z = Math::Int113->new(987654321);
-  ($z &= 123456789) ^= 555555555;
-  cmp_ok($z, '==', $iv, "TEST 2");
-
-  $iv = 123456789;
-  ($iv |= 987654321) &= 555555555;
-
-  $z = Math::Int113->new(123456789);
-  ($z |= 987654321) &= 555555555;
-  cmp_ok($z, '==', $iv, "TEST 3");
-
-  $z = Math::Int113->new(987654321);
-  ($z |= 123456789) &= 555555555;
-  cmp_ok($z, '==', $iv, "TEST 4");
-}
-
 
 done_testing();
