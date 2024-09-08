@@ -2,8 +2,7 @@
 use strict;
 use warnings;
 use Config;
-
-use Test::More;
+use Math::Int113;
 
 BEGIN {
   if($] <= 5.041002) {
@@ -13,6 +12,8 @@ BEGIN {
     exit;
   }
 };
+
+use Test::More;
 
 my $iv = 123456789;
 ($iv &= 987654321) ^= 555555555;
@@ -35,3 +36,5 @@ cmp_ok($z, '==', $iv, "TEST 3");
 $z = Math::Int113->new(987654321);
 ($z |= 123456789) &= 555555555;
 cmp_ok($z, '==', $iv, "TEST 4");
+
+done_testing();
