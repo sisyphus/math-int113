@@ -57,13 +57,14 @@ cmp_ok(~$not_obj1, '==', $obj1, "~(~1st) evaluates correctly");
 cmp_ok(~$not_obj2, '==', $obj2, "~(~2nd) evaluates correctly");
 
 my $not_zero = ~(Math::Int113->new(0));
+my $nnot_zero = $not_zero * -1;
 cmp_ok($not_zero, '==', Math::Int113->new(10384593717069655257060992658440191), '~(Math::Int113->new(0)) evaluates to 10384593717069655257060992658440191');
 cmp_ok($not_zero, '==', (2 ** 113) - 1, '~(Math::Int113->new(0)) evaluates to (2**113)-1');
 
-$not_zero++;
-cmp_ok($not_zero, '==', 2 ** 113, '~(Math::Int113->new(0)) increments to 2**113');
+eval{$not_zero++;};
+like($@, qr/10384593717069655257060992658440191 overflows '\+\+'/, '~(Math::Int113->new(0)) overflows on ++');
 
-$not_zero--;
-cmp_ok($not_zero, '==', ~(Math::Int113->new(0)), 'Math::Int113->new(2**113) decrements to ~(Math::Int113->new(0))');
+eval{$nnot_zero--;};
+like($@, qr/-10384593717069655257060992658440191 overflows '\-\-'/, '-(~(Math::Int113->new(0))) overlfows on --');
 
 done_testing();

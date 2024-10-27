@@ -27,9 +27,9 @@ cmp_ok($obj2 >> 64, '==', 12344, "2nd >> 64 == 12344");
 cmp_ok($obj1 << 11, '==', 2052189357727695981114193920, "1st << 11 == 2052189357727695981114193920");
 cmp_ok($obj2 << 11, '==', 466380913848206161279334400,  "2nd << 11 == 466380913848206161279334400");
 
-cmp_ok($obj1 & $obj2, '==', 76461754185526091385799, "1st & 2nd evaluates correctly");
+cmp_ok($obj1 & $obj2, '==', 76461754185526091385799, "1st & 2nd evaluates correctly");   # 9
 cmp_ok($obj1 | $obj2, '==', 1153308886232394876579791, "1st | 2nd evaluates correctly");
-cmp_ok($obj1 ^ $obj2, '==', 1076847132046868785193992, "1st ^ 2nd evaluates correctly");
+cmp_ok($obj1 ^ $obj2, '==', 1076847132046868785193992, "1st ^ 2nd evaluates correctly"); # 11
 
 my $not_obj1 = ~$obj1;
 my $not_obj2 = ~$obj2;
@@ -37,18 +37,19 @@ my $not_obj2 = ~$obj2;
 cmp_ok($not_obj1, '==', 10384593716067609672233016105161776, "~1st evaluates correctly");
 cmp_ok($not_obj2, '==', 10384593716841930201471048243753016, "~2nd evaluates correctly");
 
-cmp_ok(~$not_obj1, '==', $obj1, "~(~1st) evaluates correctly");
-cmp_ok(~$not_obj2, '==', $obj2, "~(~2nd) evaluates correctly");
+cmp_ok(~$not_obj1, '==', $obj1, "~(~1st) evaluates correctly"); # 14
+cmp_ok(~$not_obj2, '==', $obj2, "~(~2nd) evaluates correctly"); # 15
 
 my $not_zero = ~(Math::Int113->new(0));
+my $nnot_zero = $not_zero * -1;
 cmp_ok($not_zero, '==', Math::Int113->new(10384593717069655257060992658440191), '~(Math::Int113->new(0)) evaluates to 10384593717069655257060992658440191');
-cmp_ok($not_zero, '==', (2 ** 113) - 1, '~(Math::Int113->new(0)) evaluates to (2**113)-1');
+cmp_ok($not_zero, '==', (2 ** 113) - 1, '~(Math::Int113->new(0)) evaluates to (2**113)-1'); # 17
 
-$not_zero++;
-cmp_ok($not_zero, '==', 2 ** 113, '~(Math::Int113->new(0)) increments to 2**113');
+eval{$not_zero++;};
+like($@, qr/10384593717069655257060992658440191 overflows '\+\+'/, '~(Math::Int113->new(0)) overflows on ++');
 
-$not_zero--;
-cmp_ok($not_zero, '==', ~(Math::Int113->new(0)), 'Math::Int113->new(2**113) decrements to ~(Math::Int113->new(0))');
+eval{$nnot_zero--;};
+like($@, qr/-10384593717069655257060992658440191 overflows '\-\-'/, '-(~(Math::Int113->new(0))) overlfows on --');
 
 my $other = Math::Int113->new('12345678909876543212345');
 my $not_other = ~$other;
@@ -156,7 +157,5 @@ for(1..100) {
   my $shift = 3 + int(rand(20));
   cmp_ok($uv << $shift, '==', $inc << $shift, "\$uv << \$shift == \$inc << \$shift");
 }
-
-
 
 done_testing();

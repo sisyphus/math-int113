@@ -28,26 +28,26 @@ like ($@, qr/overflows 113 bits/, '-10384593717069655257060992658440192 overflow
 my $inf = 99 ** (99 ** 99);
 
 eval { my $x = Math::Int113->new($inf);};
-like ($@, qr/overflows 113 bits/, 'Inf overflows');
+like ($@, qr/Inf value encountered/, 'Inf overflows');
 
 eval { my $x = Math::Int113->new(-$inf);};
-like ($@, qr/overflows 113 bits/, '-Inf overflows');
+like ($@, qr/Inf value encountered/, '-Inf overflows');
 
 my $nan = $inf /  $inf;
 
 if($nan != $nan) {
   eval { my $x = Math::Int113->new($nan);};
-  like ($@, qr/overflows 113 bits/, 'NaN overflows');
+  like ($@, qr/NaN value encountered/, 'NaN overflows');
 }
 
 eval{ $ret = Math::Int113->new(10) & $nan; };
-like ($@, qr/overflow/i, '& NaN overflows');
+like ($@, qr/NaN value encountered/i, '& NaN overflows');
 
 eval{ $ret = Math::Int113->new(10) | $nan; };
-like ($@, qr/overflow/i, '| NaN overflows');
+like ($@, qr/NaN value encountered/i, '| NaN overflows');
 
 eval{ $ret = Math::Int113->new(10) ^ $nan; };
-like ($@, qr/overflow/i, '^ NaN overflows');
+like ($@, qr/NaN value encountered/i, '^ NaN overflows');
 
 require Math::BigInt;
 my $v1 = Math::BigInt->new(18446744073709551615) ** 2;

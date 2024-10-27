@@ -8,6 +8,7 @@ require Exporter;
 require DynaLoader;
 
 $Math::Int113::VERSION = '0.06';
+
 Math::Int113->DynaLoader::bootstrap($Math::Int113::VERSION);
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
@@ -85,7 +86,13 @@ sub overflows {
   # This is a private sub. No need to check initialization in here.
   no warnings 'uninitialized';
   my $v = shift;
-  return 1 if $v != $v; # NaN
+  die "NaN value encountered"
+    if $v != $v; # NaN
+
+  if($v != 0) {
+    die "Inf value encountered"
+      if $v / $v != 1;
+  }
   return 1
     if($v >=  1.0384593717069655257060992658440192e34 ||
        $v <= -1.0384593717069655257060992658440192e34);
@@ -236,13 +243,13 @@ sub oload_spaceship {
 
 sub oload_inc {
   die "$_[0] overflows '++'"
-    unless $_[0] < 1.0384593717069655257060992658440192e34 ;
+    unless $_[0] < 1.0384593717069655257060992658440191e34 ;
   ($_[0]->{val})++;
 }
 
 sub oload_dec {
   die "$_[0] overflows '--'"
-    unless $_[0] > -1.0384593717069655257060992658440192e34 ;
+    unless $_[0] > -1.0384593717069655257060992658440191e34 ;
   ($_[0]->{val})--;
 }
 
